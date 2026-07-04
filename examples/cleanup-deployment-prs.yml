@@ -15,7 +15,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - uses: GlueOps/github-actions-cleanup-deployment-prs@v1.0.0 # x-release-please-version
+      - uses: GlueOps/github-actions-cleanup-deployment-prs@v1.0.1 # x-release-please-version
         with:
           pr_number: ${{ github.event.pull_request.number }}
           gh_token: ${{ secrets.GITHUB_TOKEN }}
