@@ -1,6 +1,6 @@
 {
   "name": "github-actions-cleanup-deployment-prs",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Close superseded deployment PRs and delete their branches in the GlueOps deployment-configurations repo.",
   "main": "dist/index.js",
