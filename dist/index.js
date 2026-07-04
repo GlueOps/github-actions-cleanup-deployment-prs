@@ -46851,7 +46851,10 @@ function getOctokit(token, options, ...additionalPlugins) {
 }
 //# sourceMappingURL=github.js.map
 ;// CONCATENATED MODULE: ./src/lib.ts
-const MARKER_RE = /<!--\s*glueops-deploy:(\{.*?\})\s*-->/;
+// Capture the whole payload, not just up to the first `}` — a `}` inside a JSON string
+// value (an app/env containing one) must not truncate the capture. `s` lets `.` cross
+// newlines defensively; JSON.parse validates. Must stay in lock-step with the bump action.
+const MARKER_RE = /<!--\s*glueops-deploy:(.+?)\s*-->/s;
 function parseMarker(body) {
     if (!body)
         return null;
@@ -46859,7 +46862,7 @@ function parseMarker(body) {
     if (!m)
         return null;
     try {
-        const o = JSON.parse(m[1]);
+        const o = JSON.parse(m[1].trim());
         if (typeof o.app === "string" &&
             typeof o.env === "string" &&
             typeof o.tag === "string") {

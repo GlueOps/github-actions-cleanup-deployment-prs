@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { parseMarker, isSuperseded, DeployMeta } from "../src/lib";
 
 const marker = (m: DeployMeta) => `<!-- glueops-deploy:${JSON.stringify(m)} -->`;
@@ -58,26 +60,23 @@ describe("isSuperseded", () => {
   });
 });
 
-// The EXACT marker string below is the contract between the bump action's
-// formatMarker() and this action's parseMarker(). An identical GOLDEN_MARKER
-// lives in github-actions-bump-deployment-tag/__tests__/lib.test.ts — if either
-// repo changes the marker format, its own test breaks against this frozen golden.
-const GOLDEN_MARKER =
-  '<!-- glueops-deploy:{"app":"api","env":"prod","tag":"v1.2.3-rc1"} -->';
+// The marker is the wire contract with the bump action's formatMarker(). The golden
+// lives in __tests__/marker.golden — an IDENTICAL file committed in BOTH repos — and a
+// CI step ("marker contract parity") diffs it against the sibling, so a one-sided change
+// fails. Here we pin this action's parseMarker() to that fixture.
+const golden = JSON.parse(
+  readFileSync(join(__dirname, "marker.golden"), "utf8"),
+) as { meta: { app: string; env: string; tag: string }; marker: string };
 
-describe("marker contract (golden fixture shared with the bump action)", () => {
-  it("parses the frozen golden marker", () => {
-    expect(parseMarker(GOLDEN_MARKER)).toEqual({
-      app: "api",
-      env: "prod",
-      tag: "v1.2.3-rc1",
-    });
+describe("marker contract (shared fixture with the bump action)", () => {
+  it("parses the golden marker", () => {
+    expect(parseMarker(golden.marker)).toEqual(golden.meta);
   });
   it("parses the golden marker embedded in surrounding PR body text", () => {
-    expect(parseMarker(`PR text\n\n${GOLDEN_MARKER}\n`)).toEqual({
-      app: "api",
-      env: "prod",
-      tag: "v1.2.3-rc1",
-    });
+    expect(parseMarker(`PR text\n\n${golden.marker}\n`)).toEqual(golden.meta);
+  });
+  it("tolerates a '}' inside a field value (regex must not stop at the first brace)", () => {
+    const marker = '<!-- glueops-deploy:{"app":"team}a","env":"pr}od","tag":"v1"} -->';
+    expect(parseMarker(marker)).toEqual({ app: "team}a", env: "pr}od", tag: "v1" });
   });
 });

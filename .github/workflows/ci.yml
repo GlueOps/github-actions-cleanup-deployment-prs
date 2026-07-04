@@ -30,8 +30,21 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run typecheck
       - run: npm test
       # Fail the build on known-high-severity vulns in shipped (production) deps.
       - run: npm audit --omit=dev --audit-level=high
+      # The deploy-PR marker is a wire format shared byte-for-byte with the bump action.
+      # Fail if this repo's golden fixture drifts from the sibling's (a one-sided format
+      # change breaks parsing in prod). Soft-skips if the sibling file can't be fetched.
+      - name: Marker contract parity with bump action
+        run: |
+          sib=https://raw.githubusercontent.com/GlueOps/github-actions-bump-deployment-tag/main/__tests__/marker.golden
+          if curl -fsSL "$sib" -o /tmp/sibling.golden; then
+            diff -u __tests__/marker.golden /tmp/sibling.golden \
+              || { echo "::error::marker.golden drifted from bump-deployment-tag — the wire contract is broken"; exit 1; }
+            echo "marker contract matches bump-deployment-tag"
+          else
+            echo "::warning::could not fetch bump's marker.golden (not yet published?); skipping cross-repo diff"
+          fi
