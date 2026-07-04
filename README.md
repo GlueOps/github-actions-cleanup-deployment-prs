@@ -66,9 +66,9 @@ Usable directly via `uses:`. If private/internal, enable *Settings → Actions �
 
 ```bash
 docker run --rm -v "$PWD":/app -w /app node:24-bookworm-slim \
-  sh -c "npm ci && npm run typecheck && npm test && npm run build"
+  sh -c "npm ci --ignore-scripts && npm run typecheck && npm test && npm run build"
 ```
 
-`dist/index.js` is a committed `ncc` bundle that GitHub runs directly. **You never hand-build it:** `build-dist.yml` rebuilds and commits it on every PR (incl. Renovate PRs) and self-heals `main`; `ci.yml` validates source only (typecheck + Jest + `npm audit`) and asserts `.nvmrc` matches the action runtime. Deps pinned via `package-lock.json`; toolchain exact-pinned (`.nvmrc`, `ncc`, `typescript`); the org Renovate bot keeps them updated.
+`dist/index.js` is a committed `ncc` bundle that GitHub runs directly. **You never hand-build it:** `build-dist.yml` rebuilds and commits it on every PR (incl. Renovate PRs) and self-heals `main`; `ci.yml` validates source only (typecheck + Jest + `npm audit`, plus a cross-repo marker-contract check with the bump action) and asserts `.nvmrc` matches the action runtime. Deps pinned via `package-lock.json`; toolchain exact-pinned (`.nvmrc`, `ncc`, `typescript`); the org Renovate bot keeps them updated.
 
 > Note on required checks: the `dist` auto-commit is pushed with `GITHUB_TOKEN`, which doesn't re-trigger workflows, so a runtime-dep PR's final commit has no fresh `validate` run. If you enforce required checks, that can block the merge until CI re-runs — either merge manually (reviewed) or push `dist` from a GitHub App token. Releases are cut by release-please (Conventional Commits) and attach build provenance. Pure logic is in `src/lib.ts` (unit-tested).
