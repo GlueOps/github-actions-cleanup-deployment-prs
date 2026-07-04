@@ -1,0 +1,21 @@
+# Place this in the DEPLOYMENT-CONFIGURATIONS repo at .github/workflows/cleanup-deployment-prs.yml
+# Fires on the deploy PRs that github-actions-bump-deployment-tag opens here, and closes
+# any older PRs for the same app + environment (different tag), deleting their branches.
+name: Cleanup deployment PRs
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  contents: write        # delete superseded branches
+  pull-requests: write   # close superseded PRs
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GlueOps/github-actions-cleanup-deployment-prs@v0.0.0 # x-release-please-version
+        with:
+          pr_number: ${{ github.event.pull_request.number }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
