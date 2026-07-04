@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/compare/v1.0.0...v1.0.1) (2026-07-04)
+
+
+### Bug Fixes
+
+* no actual fix. Just triggering a new release ([#8](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/issues/8)) ([33a12e2](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/commit/33a12e2758258cb189a3768071782f4a77124dc9))
+
 ## 1.0.0 (2026-07-04)
 
 
