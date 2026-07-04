@@ -10,14 +10,17 @@ export interface DeployMeta {
   tag: string;
 }
 
-const MARKER_RE = /<!--\s*glueops-deploy:(\{.*?\})\s*-->/;
+// Capture the whole payload, not just up to the first `}` — a `}` inside a JSON string
+// value (an app/env containing one) must not truncate the capture. `s` lets `.` cross
+// newlines defensively; JSON.parse validates. Must stay in lock-step with the bump action.
+const MARKER_RE = /<!--\s*glueops-deploy:(.+?)\s*-->/s;
 
 export function parseMarker(body: string | null | undefined): DeployMeta | null {
   if (!body) return null;
   const m = body.match(MARKER_RE);
   if (!m) return null;
   try {
-    const o = JSON.parse(m[1]) as Record<string, unknown>;
+    const o = JSON.parse(m[1].trim()) as Record<string, unknown>;
     if (
       typeof o.app === "string" &&
       typeof o.env === "string" &&
