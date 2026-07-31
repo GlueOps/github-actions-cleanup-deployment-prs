@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/compare/v1.0.1...v1.0.2) (2026-07-31)
+
+
+### Miscellaneous Chores
+
+* add Apache-2.0 LICENSE ([#12](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/issues/12)) ([7c45ef6](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/commit/7c45ef645a625aa603b21870b48654f78c8f7f3d))
+
 ## [1.0.1](https://github.com/GlueOps/github-actions-cleanup-deployment-prs/compare/v1.0.0...v1.0.1) (2026-07-04)
 
 
